@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0" />
+  <title>Louvor PRO — Gestão de Ministério</title>
+
+  <link rel="icon" type="image/png" href="./Logo Redondo Cifras.png">
+  <link rel="apple-touch-icon" href="./Logo Redondo Cifras.png">
+
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <link rel="stylesheet" href="./styles.css">
+
+  <!-- Netlify Identity (login do Admin) -->
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+
+  <!-- OneSignal -->
+  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+  <script>
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    OneSignalDeferred.push(async function(OneSignal) {
+      await OneSignal.init({
+        appId: "bcd42958-e8f3-4c42-a8f8-9fd6c9219eed",
+        safari_web_id: "web.onesignal.auto.5ffbfb2e-5b9e-4e33-a6e5-d97b1e693743",
+        notifyButton: { enable: true },
+      });
+      if (!OneSignal.Notifications.permission) {
+        OneSignal.Slidedown.promptDefault();
+      }
+    });
+  </script>
+</head>
+
+<body>
+
+<header>
+  <div class="logo-container">
+    <img src="./Logo Redondo Cifras.png" class="logo-img"
+         onerror="this.src='https://ui-avatars.com/api/?name=L+P&background=2dd4bf&color=020617'" alt="Logo">
+  </div>
+  <div class="header-info">
+    <h1 id="hdr-title">MINISTÉRIO DE LOUVOR</h1>
+    <p id="hdr-sub"><i class="far fa-calendar-alt"></i> JANEIRO 2026 • SUPORTE MUSICAL</p>
+    <div class="auth-row">
+      <button id="btn-login" class="small-btn" style="display:none;"><i class="fas fa-lock"></i> Entrar (Admin)</button>
+      <button id="btn-logout" class="small-btn danger" style="display:none;"><i class="fas fa-sign-out-alt"></i> Sair</button>
+    </div>
+  </div>
+</header>
+
+<nav id="nav-tabs">
+  <div class="tab active" data-tab="escalas"><i class="fas fa-list-ul"></i> Escalas</div>
+  <div class="tab" data-tab="ensaios"><i class="fas fa-music"></i> Ensaios</div>
+  <div class="tab" data-tab="membros"><i class="fas fa-users"></i> Membros</div>
+  <div class="tab" data-tab="discipulado"><i class="fas fa-hands-helping"></i> Discipulado</div>
+  <div class="tab" data-tab="uniformes"><i class="fas fa-tshirt"></i> Uniformes</div>
+  <div class="tab" data-tab="info"><i class="fas fa-info-circle"></i> Info</div>
+  <div class="tab" data-tab="ferramentas"><i class="fas fa-tuning-fork"></i> Ferramentas</div>
+  <div class="tab" data-tab="notificacoes">
+    <i class="fas fa-bell"></i> Avisos
+    <span id="notif-badge" style="display:none; background:red; color:white; border-radius:50%; padding:2px 6px; font-size:10px;">!</span>
+  </div>
+  <div class="tab admin-only" data-tab="admin"><i class="fas fa-user-shield"></i> Admin</div>
+</nav>
+
+<div class="container">
+
+  <!-- ESCALAS -->
+  <section id="escalas" class="section active">
+    <div class="sub-nav" id="escalas-subs">
+      <div class="badge active" data-type="banda">🎸 BANDA</div>
+      <div class="badge" data-type="danca">💃 DANÇA</div>
+      <div class="badge" data-type="midia">🎥 MÍDIA</div>
+      <div class="badge" data-type="som">🎚️ SOM</div>
+    </div>
+
+    <div class="card" id="escala-render-area" style="padding: 10px;"></div>
+  </section>
+
+  <!-- ENSAIOS -->
+  <section id="ensaios" class="section">
+    <div class="card-title" id="ensaios-title"><i class="fas fa-clock"></i> CRONOGRAMA DE ESTUDO</div>
+    <p id="ensaios-subtitle" style="font-size: 0.8rem; color: var(--text-muted); margin: -10px 0 20px 5px;"></p>
+    <div id="ensaios-container"></div>
+  </section>
+
+  <!-- MEMBROS -->
+  <section id="membros" class="section">
+    <div class="members-grid" id="members-container"></div>
+  </section>
+
+  <!-- DISCIPULADO -->
+  <section id="discipulado" class="section">
+    <div class="card">
+      <div class="card-title" id="discipulado-title">📖 Texto base do estudo</div>
+      <div style="font-size: 0.9rem; line-height: 1.6; color: var(--text-main);">
+        <p><strong id="discipulado-subtitle">Romanos 8:1–17 (NVI)</strong></p>
+        <div style="background: var(--glass); padding: 15px; border-radius: 12px; border-left: 4px solid var(--accent); font-style: italic; max-height: 400px; overflow-y: auto; font-size: 0.85rem; white-space: pre-line;" id="discipulado-passagem"></div>
+      </div>
+    </div>
+
+    <div class="card-title"><i class="fas fa-users"></i> 👥 Grupos de Discipulado</div>
+    <div id="grupos-container"></div>
+  </section>
+
+  <!-- UNIFORMES -->
+  <section id="uniformes" class="section">
+    <div class="card">
+      <div class="card-title"><i class="fas fa-palette"></i> <span id="uniformes-title">PADRÃO VISUAL</span></div>
+
+      <div id="uniformes-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px;"></div>
+
+      <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 15px; text-align: center;">
+        <i class="fas fa-info-circle"></i> Toque no quadrado para ver a referência de cor.
+      </p>
+    </div>
+  </section>
+
+  <!-- INFO -->
+  <section id="info" class="section">
+    <div class="sub-nav" id="info-subs">
+      <div class="badge active" data-info="louvor">🎶 LOUVOR</div>
+      <div class="badge" data-info="danca">💃 DANÇA</div>
+      <div class="badge" data-info="midia">📸 MÍDIA</div>
+      <div class="badge" data-info="som">🎚️ SOM</div>
+    </div>
+    <div class="card">
+      <div id="info-container" class="info-content-box"></div>
+    </div>
+  </section>
+
+  <!-- FERRAMENTAS -->
+  <section id="ferramentas" class="section">
+    <div class="card" style="margin-bottom: 20px;">
+      <div class="card-title"><i class="fas fa-search"></i> BUSCAR CIFRA ONLINE</div>
+      <div style="display: flex; gap: 10px;">
+        <input type="text" id="search-input" placeholder="Música ou Artista..."
+               style="flex: 1; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--glass); color: white; font-family: inherit;">
+        <button class="btn-escala" style="width: auto; padding: 0 20px;" onclick="buscarCifra()">BUSCAR</button>
+      </div>
+    </div>
+
+    <div class="tool-container">
+      <div class="card" style="text-align: center;">
+        <div class="card-title">🎵 METRÔNOMO</div>
+        <div class="met-circle-wrap">
+          <svg class="met-circle-svg">
+            <circle class="met-circle-bg" cx="80" cy="80" r="70"></circle>
+            <circle id="met-progress" class="met-circle-progress" cx="80" cy="80" r="70"></circle>
+          </svg>
+          <div class="met-content">
+            <div style="display: flex; align-items: center; justify-content: center;">
+              <button class="met-btn-step" onclick="changeBpm(-1)"><i class="fas fa-chevron-down"></i></button>
+              <span id="bpm-value" class="met-bpm-num">120</span>
+              <button class="met-btn-step" onclick="changeBpm(1)"><i class="fas fa-chevron-up"></i></button>
+            </div>
+            <span class="met-bpm-label">BPM</span>
+          </div>
+        </div>
+        <input type="range" id="bpm-slider" min="40" max="220" value="120" style="width: 100%; margin-bottom: 20px;">
+        <select id="met-sound" class="select-met">
+          <option value="padrao">Som Padrão (Beep)</option>
+          <option value="01.wav">Som 01.wav</option>
+          <option value="02.wav">Som 02.wav</option>
+          <option value="03.wav">Som 03.wav</option>
+          <option value="04.wav">Som 04.wav</option>
+          <option value="05.wav">Som 05.wav</option>
+          <option value="06.wav">Som 06.wav</option>
+          <option value="07.wav">Som 07.wav</option>
+          <option value="08.wav">Som 08.wav</option>
+          <option value="09.wav">Som 09.wav</option>
+        </select>
+        <button class="btn-escala" onclick="toggleMetronome()" id="btn-met" style="margin-top: 20px;">INICIAR</button>
+      </div>
+
+      <div class="card" style="text-align: center;">
+        <div class="card-title">🎸 AFINADOR</div>
+        <div class="tuner-ui">
+          <div class="tuner-arc"></div>
+          <div id="pitch-note">--</div>
+        </div>
+        <div class="led-container">
+          <div id="l5" class="led"></div>
+          <div id="l3" class="led"></div>
+          <div id="l1" class="led"></div>
+          <div id="center-led" class="led led-center"></div>
+          <div id="r1" class="led"></div>
+          <div id="r3" class="led"></div>
+          <div id="r5" class="led"></div>
+        </div>
+        <div id="pitch-freq">Frequência: 0.0 Hz</div>
+        <button class="btn-escala" id="btn-tuner" onclick="toggleTuner()">LIGAR AFINADOR</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- AVISOS -->
+  <section id="notificacoes" class="section">
+    <div class="card">
+      <div class="card-title"><i class="fas fa-bullhorn"></i> MURAL DE AVISOS</div>
+      <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: -10px; margin-bottom: 15px;">
+        Histórico das últimas mensagens enviadas pelo OneSignal.
+      </p>
+      <div id="lista-notificacoes"></div>
+
+      <button onclick="limparAvisos()" style="background:none; border:none; color:var(--danger); font-size:0.75rem; cursor:pointer; width:100%; margin-top:15px; font-weight:700;">
+        <i class="fas fa-trash-alt"></i> LIMPAR HISTÓRICO
+      </button>
+    </div>
+  </section>
+
+  <!-- ADMIN -->
+  <section id="admin" class="section admin-only">
+    <div id="admin-container"></div>
+    <div class="card">
+      <div class="edit-hint">
+        🔐 Admin protegido por login (Netlify Identity). Somente quem tiver usuário/senha consegue publicar alterações para todos.
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- Modal de imagem (uniformes) -->
+<div class="modal" id="img-modal" onclick="this.style.display='none'">
+  <img src="" id="modal-img">
+</div>
+
+<!-- Modal UI genérico -->
+<div class="modal" id="ui-modal" style="display:none;" onclick="if(event.target.id==='ui-modal') this.style.display='none'">
+  <div id="ui-modal-wrap"></div>
+</div>
+
+<!-- Scripts -->
+<script src="./data-mes.js"></script>
+<script src="./tools.js"></script>
+<script src="./app.js"></script>
+
+</body>
+</html>
